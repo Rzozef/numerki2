@@ -6,21 +6,21 @@ def is_good_enough(x_previous, x_current, epsilon):
 
 
 def load_from_file(path):
-    m = []
+    m1 = []
     count_rows = 0
     with open(path) as file:
         for line in file:
-            m.append(line.split())
+            m1.append(line.split())
             count_rows += 1
     m2 = []
     for i in range(count_rows):
-        for j in range(len(m[i])):
-            m2.append(int(m[i][j].rstrip(',')))
+        for j in range(len(m1[i])):
+            m2.append(m1[i][j].rstrip(','))  # typ string, mozna rzutowac w tym miejscu na inta, ale niektore macierze maja floatygit 
     m3 = []
     matrix = []
     for i in range(count_rows):
-        for j in range(len(m[i])):
-            m3.append(m2[i * len(m[i]) + j])
+        for j in range(len(m1[i])):
+            m3.append(m2[i * len(m1[i]) + j])
         matrix.append(m3.copy())
         m3.clear()
     return np.asmatrix(matrix)
