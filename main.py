@@ -96,7 +96,17 @@ def main():
         while int(how_much) <= 0:
             print("Ile równań chcesz wprowadzić?")
             how_much = input("\t\t>>> ")
-        # todo wczytywanie wspolczynnikow z konsoli
+        m = []
+        matrix = []
+        for i in range(int(how_much)):
+            for j in range(int(how_much)):
+                print("Wprowadz " + str(j + 1) + " wspolczynnik rownania nr " + str(i + 1))
+                m.append(input("\t\t>>> "))
+            print("Wprowadz wynik rownania nr " + str(i + 1))
+            m.append(input("\t\t>>> "))
+            matrix.append(m.copy())
+            m.clear()
+        matrix = np.asmatrix(matrix)
     else:
         print("Podaj sciezke do pliku")
         path = input("\t\t>>> ")
@@ -110,17 +120,15 @@ def main():
         if int(stop_term) < 1 or int(stop_term) > 2:
             print("Nie ma takiej opcji w menu")
             stop_term = None
-
     epsilon, iterations = None, 0
-
     if stop_term == "1":
         while epsilon is None:
             epsilon = input("Podaj epsilon: ")
     else:
         while iterations == 0:
             iterations = input("Podaj maksymalną liczbę iteracji: ")
-    gauss_seidel_method(matrix)
-
+    # gauss_seidel_method(matrix)
+    print(matrix)
 
 if __name__ == "__main__":
     main()
