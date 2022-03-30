@@ -46,11 +46,9 @@ def return_a(matrix):
 
 def is_diagonally_dominant(matrix):
     diag = np.diag(np.abs(matrix))
-    print(diag)
     off_diag = np.sum(np.abs(matrix), axis=1)
     for i in range(len(diag)):
         off_diag[i] -= diag[i]
-    print(off_diag)
     if np.all(diag > off_diag):
         return True
     else:
@@ -58,13 +56,15 @@ def is_diagonally_dominant(matrix):
 
 
 def gauss_seidel_method(matrix):
-    # TODO jakie byly warunki konieczne?
+    if not is_diagonally_dominant(return_a(matrix)):
+        raise Exception("Macierz nie spełnia warunku zbieżności")
+    # TODO sprawdzic czy jest redukowalna (cos jeszcze?)
     b = return_b(matrix)
     a = return_a(matrix)
     x = []
     xmatrix = []
     for i in range(len(b)):
-        x.append(0)
+        x.append(1)
         xmatrix.append(x.copy())
         x.clear()
     xmatrix = np.asmatrix(xmatrix)
