@@ -1,4 +1,7 @@
+from types import SimpleNamespace
+
 import numpy as np
+import json
 # todo poprawienie typow danych w macierzach, naprawienie samego algorytmu, dodanie warunków
 
 def is_good_enough(x_previous, x_current, epsilon):
@@ -6,25 +9,21 @@ def is_good_enough(x_previous, x_current, epsilon):
 
 
 def load_from_file(path):
-    m1 = []
-    count_rows = 0
-    with open(path) as file:
-        for line in file:
-            m1.append(line.split())
-            count_rows += 1
-    m2 = []
-    for i in range(count_rows):
-        for j in range(len(m1[i])):
-            m2.append(float(m1[i][j].rstrip(',')))
-    m3 = []
-    matrix = []
-    for i in range(count_rows):
-        for j in range(len(m1[i])):
-            m3.append(m2[i * len(m1[i]) + j])
-        matrix.append(m3.copy())
-        m3.clear()
-    return np.asmatrix(matrix)
+    with open(path, "r") as file:
+        input = json.load(file)
+        matrix = []
+        for arr in input:
+            matrix.append(arr)
+        return np.asmatrix(matrix)
 
+def save_to_file(matrix, path):
+    for arr in matrix:
+        print(arr)
+    with open(path, "w") as file:
+        buffer = []
+        for arr in matrix:
+            buffer.append(arr.tolist()[0])
+        json.dump(buffer, file)
 
 def return_b(matrix):
     b = []
@@ -100,9 +99,9 @@ def main():
         for i in range(int(how_much)):
             for j in range(int(how_much)):
                 print("Wprowadz " + str(j + 1) + " wspolczynnik rownania nr " + str(i + 1))
-                m.append(input("\t\t>>> "))
+                m.append(float(input("\t\t>>> ")))
             print("Wprowadz wynik rownania nr " + str(i + 1))
-            m.append(input("\t\t>>> "))
+            m.append(float(input("\t\t>>> ")))
             matrix.append(m.copy())
             m.clear()
         matrix = np.asmatrix(matrix)
