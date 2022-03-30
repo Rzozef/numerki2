@@ -1,5 +1,5 @@
 import numpy as np
-
+# todo poprawienie typow danych w macierzach, naprawienie samego algorytmu, dodanie warunków
 
 def is_good_enough(x_previous, x_current, epsilon):
     return abs(x_current - x_previous) < epsilon
@@ -15,8 +15,7 @@ def load_from_file(path):
     m2 = []
     for i in range(count_rows):
         for j in range(len(m1[i])):
-            m2.append(m1[i][j].rstrip(','))  # typ string, mozna rzutowac w tym miejscu na inta, ale niektore
-            # macierze maja floaty
+            m2.append(float(m1[i][j].rstrip(',')))
     m3 = []
     matrix = []
     for i in range(count_rows):
