@@ -1,5 +1,5 @@
 import numpy as np
-# todo poprawienie typow danych w macierzach, naprawienie samego algorytmu, dodanie warunków
+
 
 def is_good_enough(x_previous, x_current, epsilon):
     return abs(x_current - x_previous) < epsilon
@@ -47,11 +47,9 @@ def return_a(matrix):
 
 def is_diagonally_dominant(matrix):
     diag = np.diag(np.abs(matrix))
-    print(diag)
     off_diag = np.sum(np.abs(matrix), axis=1)
     for i in range(len(diag)):
         off_diag[i] -= diag[i]
-    print(off_diag)
     if np.all(diag > off_diag):
         return True
     else:
@@ -59,7 +57,9 @@ def is_diagonally_dominant(matrix):
 
 
 def gauss_seidel_method(matrix):
-    # TODO jakie byly warunki konieczne?
+    if not is_diagonally_dominant(return_a(matrix)):
+        raise Exception("Macierz nie spełnia warunku zbieżności")
+    # TODO jakie byly jeszcze warunki konieczne?
     b = return_b(matrix)
     a = return_a(matrix)
     x = []
@@ -81,53 +81,56 @@ def gauss_seidel_method(matrix):
 
 
 def main():
-    choice_first = None
-    while choice_first is None:
-        print("W jaki sposób uzupełnić współczynniki?")
-        print("\t1. Ręcznie")
-        print("\t2. Wczytaj z pliku")
-        choice_first = input("\t\t>>> ")
-        if int(choice_first) < 1 or int(choice_first) > 2:
-            print("Nie ma takiej opcji w menu")
-            choice_first = None
-    if int(choice_first) == 1:
-        how_much = 0
-        while int(how_much) <= 0:
-            print("Ile równań chcesz wprowadzić?")
-            how_much = input("\t\t>>> ")
-        m = []
-        matrix = []
-        for i in range(int(how_much)):
-            for j in range(int(how_much)):
-                print("Wprowadz " + str(j + 1) + " wspolczynnik rownania nr " + str(i + 1))
-                m.append(input("\t\t>>> "))
-            print("Wprowadz wynik rownania nr " + str(i + 1))
-            m.append(input("\t\t>>> "))
-            matrix.append(m.copy())
-            m.clear()
-        matrix = np.asmatrix(matrix)
-    else:
-        print("Podaj sciezke do pliku")
-        path = input("\t\t>>> ")
-        matrix = load_from_file(path)
-    stop_term = None
-    while stop_term is None:
-        print("Wybierz warunek stopu:")
-        print("\t1. Spełnienie warunku założonego przez dokładność")
-        print("\t2. Osiągnięcie zadanej liczby iteracji")
-        stop_term = input("\t\t>>> ")
-        if int(stop_term) < 1 or int(stop_term) > 2:
-            print("Nie ma takiej opcji w menu")
-            stop_term = None
-    epsilon, iterations = None, 0
-    if stop_term == "1":
-        while epsilon is None:
-            epsilon = input("Podaj epsilon: ")
-    else:
-        while iterations == 0:
-            iterations = input("Podaj maksymalną liczbę iteracji: ")
-    # gauss_seidel_method(matrix)
-    print(matrix)
+    # choice_first = None
+    # while choice_first is None:
+    #     print("W jaki sposób uzupełnić współczynniki?")
+    #     print("\t1. Ręcznie")
+    #     print("\t2. Wczytaj z pliku")
+    #     choice_first = input("\t\t>>> ")
+    #     if int(choice_first) < 1 or int(choice_first) > 2:
+    #         print("Nie ma takiej opcji w menu")
+    #         choice_first = None
+    # if int(choice_first) == 1:
+    #     how_much = 0
+    #     while int(how_much) <= 0:
+    #         print("Ile równań chcesz wprowadzić?")
+    #         how_much = input("\t\t>>> ")
+    #     m = []
+    #     matrix = []
+    #     for i in range(int(how_much)):
+    #         for j in range(int(how_much)):
+    #             print("Wprowadz " + str(j + 1) + " wspolczynnik rownania nr " + str(i + 1))
+    #             m.append(input("\t\t>>> "))
+    #         print("Wprowadz wynik rownania nr " + str(i + 1))
+    #         m.append(input("\t\t>>> "))
+    #         matrix.append(m.copy())
+    #         m.clear()
+    #     matrix = np.asmatrix(matrix)
+    # else:
+    #     print("Podaj sciezke do pliku")
+    #     path = input("\t\t>>> ")
+    #     matrix = load_from_file(path)
+    # stop_term = None
+    # while stop_term is None:
+    #     print("Wybierz warunek stopu:")
+    #     print("\t1. Spełnienie warunku założonego przez dokładność")
+    #     print("\t2. Osiągnięcie zadanej liczby iteracji")
+    #     stop_term = input("\t\t>>> ")
+    #     if int(stop_term) < 1 or int(stop_term) > 2:
+    #         print("Nie ma takiej opcji w menu")
+    #         stop_term = None
+    # epsilon, iterations = None, 0
+    # if stop_term == "1":
+    #     while epsilon is None:
+    #         epsilon = input("Podaj epsilon: ")
+    # else:
+    #     while iterations == 0:
+    #         iterations = input("Podaj maksymalną liczbę iteracji: ")
+    # # gauss_seidel_method(matrix)
+    # print(matrix)
+    matrix = load_from_file("r10.txt")
+    gauss_seidel_method(matrix)
+
 
 if __name__ == "__main__":
     main()
