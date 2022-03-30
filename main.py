@@ -1,6 +1,12 @@
 import numpy as np
 import json
-# todo naprawienie algorytmu, dodanie warunków
+
+
+# todo przed rozpoczeciem algorytmu kolumny badz wiersze
+# maja byc tak poprzestawiane, zeby przekątna dominowała
+# jak sie tego nie zrobi to tylko ostatni przyklad zadziala
+# o ile w ogole zadziala, bo sie zajebac idzie z tymi indeksami
+# pozdrawiam z rodzinką
 
 def is_good_enough(x_previous, x_current, epsilon):
     return abs(x_current - x_previous) < epsilon
@@ -14,6 +20,7 @@ def load_from_file(path):
             matrix.append(arr)
         return np.asmatrix(matrix)
 
+
 def save_to_file(matrix, path):
     for arr in matrix:
         print(arr)
@@ -22,6 +29,7 @@ def save_to_file(matrix, path):
         for arr in matrix:
             buffer.append(arr.tolist()[0])
         json.dump(buffer, file)
+
 
 def return_b(matrix):
     b = []
@@ -53,27 +61,31 @@ def is_diagonally_dominant(matrix):
         return False
 
 
-def gauss_seidel_method(matrix):
+def szacher_macher(matrix):  # funkcja ma poszperać w macierzy zeby byla dominujaca na przekatnej
     if not is_diagonally_dominant(return_a(matrix)):
-        raise Exception("Macierz nie spełnia warunku zbieżności")
-    # TODO sprawdzic czy jest redukowalna (cos jeszcze?)
+        array = []
+        matrix_refactored = []  # ma przechowywac arraye
+        for i in range((return_a(matrix)).shape[0]):
+            maximum = max(return_a(matrix)[i])
+            for j in range(return_a(matrix).shape[0]):
+                if maximum == return_a(matrix)[i][j]:
+                    row = i
+                    column = j
+            # todo przesuniecie w rzedzie o daną ilosc miejsc
+            # to samo z kolumnami
+        if not is_diagonally_dominant(return_a(matrix_refactored)):
+            raise Exception("Macierz nie spełnia warunku zbieżności")
+        else:
+            return np.asmatrix(matrix_refactored)
+    return matrix
+
+
+def gauss_seidel_method(matrix, epsilon, iterations=None):
+    matrix = szacher_macher(matrix)
     b = return_b(matrix)
     a = return_a(matrix)
-    x = []
-    xmatrix = []
-    for i in range(len(b)):
-        x.append(1)
-        xmatrix.append(x.copy())
-        x.clear()
-    xmatrix = np.asmatrix(xmatrix)
-    xmatrix.transpose()
-    print(xmatrix)
-    for k in range(a.shape[0]):
-        b_k = b[k]
-        for j in range(a.shape[1]):
-            if j != k:
-                b_k -= a[k][j] * xmatrix[j]  # zly wzor
-        xmatrix[k] = b_k / a[k][k]
+    xmatrix = np.zeros_like(b)
+    #todo implementacja wzoru
     return xmatrix
 
 
@@ -125,8 +137,8 @@ def main():
     #         iterations = input("Podaj maksymalną liczbę iteracji: ")
     # # gauss_seidel_method(matrix)
     # print(matrix)
-    for i in range(10):
-        print(load_from_file("r" + str(i+1) + ".txt"))
+    matrix = load_from_file("r10.txt")
+
 
 if __name__ == "__main__":
     main()
