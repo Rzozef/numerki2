@@ -59,18 +59,17 @@ def is_diagonally_dominant(matrix):
 def gauss_seidel_method(matrix):
     if not is_diagonally_dominant(return_a(matrix)):
         raise Exception("Macierz nie spełnia warunku zbieżności")
-    # TODO jakie byly jeszcze warunki konieczne?
+    # TODO sprawdzic czy jest redukowalna (cos jeszcze?)
     b = return_b(matrix)
     a = return_a(matrix)
     x = []
     xmatrix = []
     for i in range(len(b)):
-        x.append(0)
+        x.append(1)
         xmatrix.append(x.copy())
         x.clear()
     xmatrix = np.asmatrix(xmatrix)
     xmatrix.transpose()
-    print(xmatrix)
     for k in range(a.shape[0]):
         b_k = b[k]
         for j in range(a.shape[1]):
@@ -130,7 +129,6 @@ def main():
     # print(matrix)
     matrix = load_from_file("r10.txt")
     gauss_seidel_method(matrix)
-
 
 if __name__ == "__main__":
     main()
