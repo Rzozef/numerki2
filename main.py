@@ -23,53 +23,34 @@ def save_to_file(matrix, path):
         json.dump(matrix, file)
 
 
-def return_b(matrix):
-    b = []
-    for i in range(matrix.shape[0]):
-        b.append(matrix[i, matrix.shape[1] - 1])
-    b_matrix = np.asmatrix(b)
-    return b_matrix.transpose()
-
-
-def return_a(matrix):
-    a = []
-    aa = []
-    for i in range(matrix.shape[0]):
-        for j in range(matrix.shape[1] - 1):
-            a.append(matrix[i, j])
-        aa.append(a.copy())
-        a.clear()
-    return np.asmatrix(aa)
+# def return_b(matrix):
+#     b = []
+#     for i in range(matrix.shape[0]):
+#         b.append(matrix[i, matrix.shape[1] - 1])
+#     b_matrix = np.asmatrix(b)
+#     return b_matrix.transpose()
+#
+#
+# def return_a(matrix):
+#     a = []
+#     aa = []
+#     for i in range(matrix.shape[0]):
+#         for j in range(matrix.shape[1] - 1):
+#             a.append(matrix[i, j])
+#         aa.append(a.copy())
+#         a.clear()
+#     return np.asmatrix(aa)
 
 
 def is_diagonally_dominant(matrix):
-    diag = np.diag(np.abs(matrix))
-    off_diag = np.sum(np.abs(matrix), axis=1)
-    for i in range(len(diag)):
-        off_diag[i] -= diag[i]
-    if np.all(diag > off_diag):
-        return True
-    else:
-        return False
+    abs_matrix = np.abs(matrix)
+    # mnożymy przez 2, ponieważ w sumie bierzemy pod uwagę element w diagonali
+    return np.all(2 * np.diag(abs_matrix) >= np.sum(abs_matrix, axis=1))
 
 
-def szacher_macher(matrix):  # funkcja ma poszperać w macierzy zeby byla dominujaca na przekatnej
-    if not is_diagonally_dominant(return_a(matrix)):
-        array = []
-        matrix_refactored = []  # ma przechowywac arraye
-        for i in range((return_a(matrix)).shape[0]):
-            maximum = max(return_a(matrix)[i])
-            for j in range(return_a(matrix).shape[0]):
-                if maximum == return_a(matrix)[i][j]:
-                    row = i
-                    column = j
-            # todo przesuniecie w rzedzie o daną ilosc miejsc
-            # to samo z kolumnami
-        if not is_diagonally_dominant(return_a(matrix_refactored)):
-            raise Exception("Macierz nie spełnia warunku zbieżności")
-        else:
-            return np.asmatrix(matrix_refactored)
-    return matrix
+def is_irreducible(a):  # funkcja ma poszperać w macierzy zeby byla dominujaca na przekatnej
+    # Sprawdzamy wszystkie permutacje kolumn i wierszy w macierzy
+    return True
 
 def variant_b(a, b, x, epsilon):
     """Macierz A, Macierz X, epsilon"""
@@ -78,7 +59,7 @@ def variant_b(a, b, x, epsilon):
         equation = a[h]
         sum = 0
         for w in range(0, len(equation)):
-            sum += equation[w] * (x[w] ** w)
+            sum += equation[w] * (x[w] ** (len(equation) - w - 1))
         diff += abs(sum - b[h])
     return diff < epsilon
 
@@ -101,6 +82,9 @@ def gauss_seidel_method(matrix, *, epsilon=None, iterations=None):
     matrix = np.array(matrix)  # TODO zmień wszystko na ndarray
     b = matrix[:, -1]
 
+    if not is_diagonally_dominant(a):
+        raise RuntimeError("Podana macierz nie jest macierzą diagonalnie dominującą")
+
     L = np.tril(a, k=-1).tolist()
     D = np.diag(np.diag(a)).tolist()  # Prościej się nie da, domyślnie np.diag(a) zwraca array
     U = np.triu(a, k=1).tolist()
@@ -108,8 +92,10 @@ def gauss_seidel_method(matrix, *, epsilon=None, iterations=None):
     inv_D = D.copy()
     for i in range(0, len(inv_D)):
         inv_D[i][i] = 1 / inv_D[i][i]
+
+    b_alter = b.copy()
     for i in range(0, len(b)):
-        b[i] *= inv_D[i][i]
+        b_alter[i] *= inv_D[i][i]
     for i in range(0, len(L)):
         for j in range(0, len(L[i])):
             L[i][j] *= inv_D[i][i]
@@ -121,7 +107,7 @@ def gauss_seidel_method(matrix, *, epsilon=None, iterations=None):
     if iterations is not None:
         for k in range(0, iterations):
             for i in range(0, n):
-                x[i] = b[i]
+                x[i] = b_alter[i]
                 for j in range(0, i):
                     x[i] -= L[i][j] * x[j]
                 for j in range(i + 1, n):
@@ -130,7 +116,7 @@ def gauss_seidel_method(matrix, *, epsilon=None, iterations=None):
         k = 0
         while not variant_b(a, b, x, epsilon):
             for i in range(0, n):
-                x[i] = b[i]
+                x[i] = b_alter[i]
                 for j in range(0, i):
                     x[i] -= L[i][j] * x[j]
                 for j in range(i + 1, n):
