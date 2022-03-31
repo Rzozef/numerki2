@@ -73,12 +73,51 @@ def szacher_macher(matrix):  # funkcja ma poszperać w macierzy zeby byla dominu
 
 
 def gauss_seidel_method(matrix, epsilon, iterations=None):
-    matrix = szacher_macher(matrix)
-    b = return_b(matrix)
-    a = return_a(matrix)
-    xmatrix = np.zeros_like(b)
+    #matrix = szacher_macher(matrix)
+    #b = return_b(matrix)
+    #a = return_a(matrix)
+    #xmatrix = np.zeros_like(b)
     # todo implementacja wzoru
-    return xmatrix
+    #return xmatrix
+
+    # pierwszym przybliżeniem są same zera
+    x = [0] * len(matrix)
+    # macierz z obciętą ostatinią kolumną
+    a = np.delete(matrix, -1, axis=1)
+
+    matrix = np.array(matrix) # TODO zmień wszystko na ndarray
+    b = matrix[:,-1]
+
+    L = np.tril(a, k=-1).tolist()
+    D = np.diag(np.diag(a)).tolist() # Prościej się nie da, domyślnie np.diag(a) zwraca array
+    U = np.triu(a, k=1).tolist()
+
+    inv_D = []
+    for arr in D:
+        a = arr.copy()
+        for i in range(0, len(a)):
+            if a[i] != 0:
+                a[i] = 1 / a[i]
+        inv_D.append(a)
+    for i in range(0, len(b)):
+        b[i] *= inv_D[i][i]
+    for i in range(0, len(L)):
+        for j in range(0, len(L[i])):
+            L[i][j] *= inv_D[i][i]
+    for i in range(0, len(U)):
+        for j in range(0, len(U[i])):
+            U[i][j] *= inv_D[i][i]
+    iter = 1000
+    n = len(x)
+    for k in range(0, iter):
+        for i in range(0, n):
+            x[i] = b[i]
+            for j in range(0, i):
+                x[i] -= L[i][j] * x[j]
+            for j in range(i+1, n):
+                x[i] -= U[i][j] * x[j]
+
+    return x
 
 
 def main():
@@ -127,9 +166,8 @@ def main():
     else:
         while iterations == 0:
             iterations = input("Podaj maksymalną liczbę iteracji: ")
-    # gauss_seidel_method(matrix)
+    print(gauss_seidel_method(matrix, 0)) # TODO wywołanie do popaawy (argumenty)
     print(matrix)
-    # matrix = load_from_file("r10.txt")
 
 
 if __name__ == "__main__":
