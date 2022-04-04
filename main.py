@@ -2,17 +2,10 @@ import numpy as np
 import json
 
 
-# todo przed rozpoczeciem algorytmu kolumny badz wiersze
-# maja byc tak poprzestawiane, zeby przekątna dominowała
-# jak sie tego nie zrobi to tylko ostatni przyklad zadziala
-# o ile w ogole zadziala, bo sie zajebac idzie z tymi indeksami
-# pozdrawiam z rodzinką
-
 def is_good_enough(x_previous, x_current, epsilon):
     return abs(x_current - x_previous) < epsilon
 
 
-# Prościej już się tego nie da napisać xD
 def load_from_file(path):
     with open(path, "r") as file:
         return json.load(file)
@@ -23,34 +16,11 @@ def save_to_file(matrix, path):
         json.dump(matrix, file)
 
 
-# def return_b(matrix):
-#     b = []
-#     for i in range(matrix.shape[0]):
-#         b.append(matrix[i, matrix.shape[1] - 1])
-#     b_matrix = np.asmatrix(b)
-#     return b_matrix.transpose()
-#
-#
-# def return_a(matrix):
-#     a = []
-#     aa = []
-#     for i in range(matrix.shape[0]):
-#         for j in range(matrix.shape[1] - 1):
-#             a.append(matrix[i, j])
-#         aa.append(a.copy())
-#         a.clear()
-#     return np.asmatrix(aa)
-
-
 def is_diagonally_dominant(matrix):
     abs_matrix = np.abs(matrix)
     # mnożymy przez 2, ponieważ w sumie bierzemy pod uwagę element w diagonali
     return np.all(2 * np.diag(abs_matrix) >= np.sum(abs_matrix, axis=1))
 
-
-def is_irreducible(a):  # funkcja ma poszperać w macierzy zeby byla dominujaca na przekatnej
-    # Sprawdzamy wszystkie permutacje kolumn i wierszy w macierzy
-    return True
 
 def variant_b(a, b, x, epsilon):
     """Macierz A, Macierz X, epsilon"""
@@ -63,14 +33,8 @@ def variant_b(a, b, x, epsilon):
         diff += abs(sum - b[h])
     return diff < epsilon
 
-def gauss_seidel_method(matrix, *, epsilon=None, iterations=None):
-    # matrix = szacher_macher(matrix)
-    # b = return_b(matrix)
-    # a = return_a(matrix)
-    # xmatrix = np.zeros_like(b)
-    # todo implementacja wzoru
-    # return xmatrix
 
+def gauss_seidel_method(matrix, *, epsilon=None, iterations=None):
     if epsilon is not None and iterations is not None:
         raise RuntimeError("Warunkami stopu dla funkcji nie może być jednocześnie ilość iteracji i epsilon!")
 
@@ -112,7 +76,7 @@ def gauss_seidel_method(matrix, *, epsilon=None, iterations=None):
                     x[i] -= L[i][j] * x[j]
                 for j in range(i + 1, n):
                     x[i] -= U[i][j] * x[j]
-    else: # Warunkiem stopu jest epsilon
+    else:  # Warunkiem stopu jest epsilon
         k = 0
         while not variant_b(a, b, x, epsilon):
             for i in range(0, n):
@@ -126,7 +90,6 @@ def gauss_seidel_method(matrix, *, epsilon=None, iterations=None):
 
 
 def main():
-    # TODO wczytywanie do poprawy
     choice_first = None
     while choice_first is None:
         print("W jaki sposób uzupełnić współczynniki?")
@@ -155,6 +118,9 @@ def main():
         print("Podaj sciezke do pliku")
         path = input("\t\t>>> ")
         matrix = load_from_file(path)
+    for i in range(len(matrix)):
+        if len(matrix) != (len(matrix[i]) - 1):
+            raise RuntimeError("Ilość równań nie jest zgodna z ilością niewiadomych")
     stop_term = None
     while stop_term is None:
         print("Wybierz warunek stopu:")
