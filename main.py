@@ -81,7 +81,7 @@ def gauss_seidel_method(matrix, *, epsilon=None, iterations=None):
                     for j in range(i + 1, n):
                         x[i] -= U[i][j] * x[j]
         else:  # Warunkiem stopu jest epsilon
-            k = 0
+            k, iterations = 0, 0
             while not variant_b(a, b, x, epsilon):
                 for i in range(0, n):
                     x[i] = b_alter[i]
@@ -90,7 +90,8 @@ def gauss_seidel_method(matrix, *, epsilon=None, iterations=None):
                     for j in range(i + 1, n):
                         x[i] -= U[i][j] * x[j]
                 k += 1
-        return x
+                iterations += 1
+        return x, iterations
     raise RuntimeError("Podana macierz nie jest macierzą diagonalnie dominującą")
 
 def main():
@@ -143,7 +144,8 @@ def main():
         while iterations == 0:
             iterations = input("Podaj liczbę iteracji: ")
         result = gauss_seidel_method(matrix, iterations=int(iterations))
-    print(result)
+    print(f"Wynik: {result[0]}")
+    print(f"Ilość iteracji: {result[1]}")
 
 
 if __name__ == "__main__":
