@@ -30,7 +30,7 @@ def variant_b(a, b, x, epsilon):
         equation = a[h]
         sum = 0
         for w in range(0, len(equation)):
-            sum += equation[w] * (x[w] ** (len(equation) - w - 1))
+            sum += equation[w] * x[w]
         diff += abs(sum - b[h])
     return diff < epsilon
 
