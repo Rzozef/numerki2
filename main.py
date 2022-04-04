@@ -1,4 +1,5 @@
 import numpy as np
+import itertools
 import json
 
 
@@ -38,56 +39,59 @@ def gauss_seidel_method(matrix, *, epsilon=None, iterations=None):
     if epsilon is not None and iterations is not None:
         raise RuntimeError("Warunkami stopu dla funkcji nie może być jednocześnie ilość iteracji i epsilon!")
 
-    # pierwszym przybliżeniem są same zera
-    x = [0] * len(matrix)
-    # macierz z obciętą ostatinią kolumną
-    a = np.delete(matrix, -1, axis=1)
+    permutations = list(itertools.permutations(matrix))
+    for matrix in permutations:
 
-    matrix = np.array(matrix)  # TODO zmień wszystko na ndarray
-    b = matrix[:, -1]
+        # pierwszym przybliżeniem są same zera
+        x = [0] * len(matrix)
+        # macierz z obciętą ostatnią kolumną
+        a = np.delete(matrix, -1, axis=1)
 
-    if not is_diagonally_dominant(a):
-        raise RuntimeError("Podana macierz nie jest macierzą diagonalnie dominującą")
+        matrix = np.array(matrix)
+        b = matrix[:, -1]
 
-    L = np.tril(a, k=-1).tolist()
-    D = np.diag(np.diag(a)).tolist()  # Prościej się nie da, domyślnie np.diag(a) zwraca array
-    U = np.triu(a, k=1).tolist()
+        if not is_diagonally_dominant(a):
+            continue
 
-    inv_D = D.copy()
-    for i in range(0, len(inv_D)):
-        inv_D[i][i] = 1 / inv_D[i][i]
+        L = np.tril(a, k=-1).tolist()
+        D = np.diag(np.diag(a)).tolist()
+        U = np.triu(a, k=1).tolist()
 
-    b_alter = b.copy()
-    for i in range(0, len(b)):
-        b_alter[i] *= inv_D[i][i]
-    for i in range(0, len(L)):
-        for j in range(0, len(L[i])):
-            L[i][j] *= inv_D[i][i]
-    for i in range(0, len(U)):
-        for j in range(0, len(U[i])):
-            U[i][j] *= inv_D[i][i]
-    n = len(x)
+        inv_D = D.copy()
+        for i in range(0, len(inv_D)):
+            inv_D[i][i] = 1 / inv_D[i][i]
 
-    if iterations is not None:
-        for k in range(0, iterations):
-            for i in range(0, n):
-                x[i] = b_alter[i]
-                for j in range(0, i):
-                    x[i] -= L[i][j] * x[j]
-                for j in range(i + 1, n):
-                    x[i] -= U[i][j] * x[j]
-    else:  # Warunkiem stopu jest epsilon
-        k = 0
-        while not variant_b(a, b, x, epsilon):
-            for i in range(0, n):
-                x[i] = b_alter[i]
-                for j in range(0, i):
-                    x[i] -= L[i][j] * x[j]
-                for j in range(i + 1, n):
-                    x[i] -= U[i][j] * x[j]
-            k += 1
-    return x
+        b_alter = b.copy()
+        for i in range(0, len(b)):
+            b_alter[i] *= inv_D[i][i]
+        for i in range(0, len(L)):
+            for j in range(0, len(L[i])):
+                L[i][j] *= inv_D[i][i]
+        for i in range(0, len(U)):
+            for j in range(0, len(U[i])):
+                U[i][j] *= inv_D[i][i]
+        n = len(x)
 
+        if iterations is not None:
+            for k in range(0, iterations):
+                for i in range(0, n):
+                    x[i] = b_alter[i]
+                    for j in range(0, i):
+                        x[i] -= L[i][j] * x[j]
+                    for j in range(i + 1, n):
+                        x[i] -= U[i][j] * x[j]
+        else:  # Warunkiem stopu jest epsilon
+            k = 0
+            while not variant_b(a, b, x, epsilon):
+                for i in range(0, n):
+                    x[i] = b_alter[i]
+                    for j in range(0, i):
+                        x[i] -= L[i][j] * x[j]
+                    for j in range(i + 1, n):
+                        x[i] -= U[i][j] * x[j]
+                k += 1
+        return x
+    raise RuntimeError("Podana macierz nie jest macierzą diagonalnie dominującą")
 
 def main():
     choice_first = None
